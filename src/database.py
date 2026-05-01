@@ -103,6 +103,15 @@ def get_store_stats(vs):
     sources = {m.get("source","?") for m in data["metadatas"]}
     return {"total": len(data["ids"]), "sources": sorted(sources)}
 
+# Retriver
+def get_retriever(search_type="mmr", k=10):
+    """Create retriever. Default: MMR for diverse results."""
+    vs = get_vector_store()
+    kwargs = {"k": k}
+    if search_type == "mmr":
+        kwargs["fetch_k"] = k * 3
+    return vs.as_retriever(search_type=search_type, search_kwargs=kwargs)
+
 if __name__ == "__main__":
     # print("---Doc Loading---")
     # docs = load_all_documents(DATA_DIR)
@@ -113,10 +122,18 @@ if __name__ == "__main__":
 
     vs = get_vector_store()
 
-    chunks = load_all_documents(DATA_DIR)
+    # chunks = load_all_documents(DATA_DIR)
 
-    add_documents_to_store(vs, chunks)
+    # add_documents_to_store(vs, chunks)
 
     stats = get_store_stats(vs)
 
     print(f"📈 {stats['total']} chunks from {len(stats['sources'])} sources")
+
+
+    # ---Retriver
+    r = get_retriever()
+    docs = r.invoke("Can i repeat tools in data science if i fail in end term?")
+    for doc in docs:
+        print("---"*20)
+        print(doc.page_content)
