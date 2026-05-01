@@ -104,7 +104,7 @@ def get_store_stats(vs):
     return {"total": len(data["ids"]), "sources": sorted(sources)}
 
 # Retriver
-def get_retriever(search_type="mmr", k=10):
+def get_retriever(search_type="mmr", k=5):
     """Create retriever. Default: MMR for diverse results."""
     vs = get_vector_store()
     kwargs = {"k": k}
