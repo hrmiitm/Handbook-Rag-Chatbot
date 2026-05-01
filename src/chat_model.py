@@ -1,7 +1,7 @@
 from langchain.chat_models import init_chat_model
 
 
-DEFAULT_MODEL = "gpt-5.4"
+DEFAULT_MODEL = "gpt-5.4-mini"
 DEFAULT_TEMPERATURE = 0.1 # To Be Grounded to facts
 DEFAULT_MAX_TOKENS = 2000
 
