@@ -122,9 +122,9 @@ if __name__ == "__main__":
 
     vs = get_vector_store()
 
-    # chunks = load_all_documents(DATA_DIR)
+    chunks = load_all_documents(DATA_DIR)
 
-    # add_documents_to_store(vs, chunks)
+    add_documents_to_store(vs, chunks)
 
     stats = get_store_stats(vs)
 
@@ -132,8 +132,8 @@ if __name__ == "__main__":
 
 
     # ---Retriver
-    r = get_retriever()
-    docs = r.invoke("Can i repeat tools in data science if i fail in end term?")
-    for doc in docs:
-        print("---"*20)
-        print(doc.page_content)
+    # r = get_retriever()
+    # docs = r.invoke("Can i repeat tools in data science if i fail in end term?")
+    # for doc in docs:
+    #     print("---"*20)
+    #     print(doc.page_content)

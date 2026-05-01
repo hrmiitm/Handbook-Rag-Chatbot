@@ -13,7 +13,7 @@ using ONLY the context below. If the answer isn't in the context,
 say "I couldn't find that in the uploaded document."
 
 Keep your answer clear, friendly, and beginner-friendly.
-Use bullet points when listing multiple things. And also quote the sources/context info that is relevant at end of final response
+Use well structure presentations in markdown consise and to the point table/bullet point etc. And also quote the sources/context info that is relevant at end of final response
 
 Make sure your response must be based on facts only
 
@@ -35,8 +35,8 @@ def format_docs_with_sources(docs):
         url = doc.metadata.get("url", "N/A")
         formatted.append(f"[Source {i+1}: {source}, Page {page}, URL {url}]\n{doc.page_content}")
     s = "\n\n---\n\n".join(formatted)
-    print(s)
-    print(docs)
+    # print(s)
+    # print(docs)
     print("---"*20)
     return s
 
@@ -45,7 +45,7 @@ def format_docs_with_sources(docs):
 llm = get_chat_model()
 retriever = get_retriever()
 
-question = "Tell me about the credit requirements for 4 year?" 
+question = "credit requirement to complete the course?" 
 
 chain = (
     {"context": retriever | format_docs_with_sources, "question": RunnablePassthrough()} | RAG_PROMPT | llm
