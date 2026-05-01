@@ -11,4 +11,6 @@ dependencies = [
     "unstructured[pdf]>=0.22.26",
     "unstructured-client>=0.43.2",
     "python-magic>=0.4.27",
+    "langchain-chroma>=1.1.0",
+    "langchain-openai>=1.2.1",
 ]

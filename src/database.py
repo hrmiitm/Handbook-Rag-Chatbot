@@ -1,10 +1,17 @@
 from langchain_unstructured import UnstructuredLoader
+from langchain_chroma import Chroma
+from langchain_openai import OpenAIEmbeddings
 import os
 
 DATA_DIR = "data"
 DATA_URL_FILE_NAME = 'resources.txt'
 CHUNK_SIZE = 1500
 CHUNK_OVERLAP = 200
+
+EMBEDDING_MODEL = "text-embedding-3-small"
+
+COLLECTION_NAME = "student_docs"
+CHROMA_DIR = "chroma_db"
 
 def load_all_documents(data_dir):
     all_doc = []
@@ -48,12 +55,21 @@ def load_all_documents(data_dir):
     return all_doc
 
 
+def get_embedding_function():
+    return OpenAIEmbeddings(model=EMBEDDING_MODEL)
+
 def get_vector_store():
-    pass
+    vector_store = Chroma(
+        collection_name=COLLECTION_NAME,
+        embedding_function=get_embedding_function(),
+        persist_directory=CHROMA_DIR,  
+    )
 
 if __name__ == "__main__":
-    print("---Doc Loading---")
-    docs = load_all_documents(DATA_DIR)
-    print("Number of Doc Loaded", len(docs), type(docs), type(docs[0]))
+    # print("---Doc Loading---")
+    # docs = load_all_documents(DATA_DIR)
+    # print("Number of Doc Loaded", len(docs), type(docs), type(docs[0]))
     # print(docs)
+
+    # print(get_vector_store())
 
