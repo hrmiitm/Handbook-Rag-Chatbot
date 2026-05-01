@@ -1,7 +1,9 @@
+import os
+import hashlib
+
 from langchain_unstructured import UnstructuredLoader
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
-import os
 
 DATA_DIR = "data"
 DATA_URL_FILE_NAME = 'resources.txt'
@@ -59,11 +61,47 @@ def get_embedding_function():
     return OpenAIEmbeddings(model=EMBEDDING_MODEL)
 
 def get_vector_store():
-    vector_store = Chroma(
+    return Chroma(
         collection_name=COLLECTION_NAME,
         embedding_function=get_embedding_function(),
         persist_directory=CHROMA_DIR,  
     )
+
+# Store in Vector Db unique chunk
+def _doc_id(doc):
+    """Generate unique ID from content + source for deduplication."""
+    # Better to hash the full content to avoid collisions on similar starting text
+    s = f"{doc.metadata.get('source','')}:{doc.page_content}"
+    return hashlib.md5(s.encode('utf-8')).hexdigest()
+
+def add_documents_to_store(vs, chunks):
+    """Add chunks with deduplication — safe to run multiple times."""
+    existing = set(vs.get()["ids"] or [])
+    
+    unique_new_chunks = []
+    unique_new_ids = []
+    seen_in_batch = set()
+    
+    for chunk in chunks:
+        c_id = _doc_id(chunk)
+        
+        # Keep chunk only if it's not in the DB AND not already in this batch
+        if c_id not in existing and c_id not in seen_in_batch:
+            unique_new_chunks.append(chunk)
+            unique_new_ids.append(c_id)
+            seen_in_batch.add(c_id)
+            
+    if unique_new_chunks:
+        vs.add_documents(unique_new_chunks, ids=unique_new_ids)
+        print(f"✅ Added {len(unique_new_chunks)} (skipped {len(chunks)-len(unique_new_chunks)})")
+    else:
+        print("ℹ️  All docs already exist")
+
+def get_store_stats(vs):
+    """Get stats about the vector store."""
+    data = vs.get()
+    sources = {m.get("source","?") for m in data["metadatas"]}
+    return {"total": len(data["ids"]), "sources": sorted(sources)}
 
 if __name__ == "__main__":
     # print("---Doc Loading---")
@@ -73,3 +111,12 @@ if __name__ == "__main__":
 
     # print(get_vector_store())
 
+    vs = get_vector_store()
+
+    chunks = load_all_documents(DATA_DIR)
+
+    add_documents_to_store(vs, chunks)
+
+    stats = get_store_stats(vs)
+
+    print(f"📈 {stats['total']} chunks from {len(stats['sources'])} sources")
